@@ -205,6 +205,7 @@ export interface SampleConfig {
 export interface LoggingConfig {
   log_every: number;
   use_ui_logger: boolean;
+  use_wandb?: boolean;
 }
 
 export interface SliderConfig {

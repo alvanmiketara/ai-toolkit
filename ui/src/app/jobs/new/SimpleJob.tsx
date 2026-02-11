@@ -8,7 +8,7 @@ import {
   defaultQtype,
   jobTypeOptions,
 } from './options';
-import { defaultDatasetConfig } from './jobConfig';
+import { defaultDatasetConfig, defaultJobConfig } from './jobConfig';
 import { GroupedSelectOption, JobConfig, SelectOption } from '@/types';
 import { objectCopy } from '@/utils/basic';
 import { TextInput, SelectInput, Checkbox, FormGroup, NumberInput, SliderInput } from '@/components/formInputs';
@@ -157,6 +157,18 @@ export default function SimpleJob({
               placeholder="Enter training name"
               disabled={runId !== null}
               required
+            />
+            <TextInput
+              label="Author / Meta Name"
+              value={jobConfig.meta?.name ?? ''}
+              onChange={value => setJobConfig(value, 'meta.name')}
+              placeholder="[name]"
+            />
+            <TextInput
+              label="Version"
+              value={jobConfig.meta?.version ?? ''}
+              onChange={value => setJobConfig(value, 'meta.version')}
+              placeholder="1.0"
             />
             <SelectInput
               label="GPU ID"
@@ -339,11 +351,28 @@ export default function SimpleJob({
           <Card title="Target">
             <SelectInput
               label="Target Type"
-              value={jobConfig.config.process[0].network?.type ?? 'lora'}
-              onChange={value => setJobConfig(value, 'config.process[0].network.type')}
+              value={jobConfig.config.process[0].network ? jobConfig.config.process[0].network.type : 'full'}
+              onChange={value => {
+                let newConfig = objectCopy(jobConfig);
+                if (value === 'full') {
+                  delete newConfig.config.process[0].network;
+                } else {
+                  if (!newConfig.config.process[0].network) {
+                    // Restore default network config if it doesn't exist
+                    newConfig.config.process[0].network = defaultJobConfig.config.process[0].network;
+                  }
+                  if (newConfig.config.process[0].network) {
+                    newConfig.config.process[0].network.type = value;
+                  }
+                }
+                // Update the entire config state
+                // @ts-ignore
+                setJobConfig(newConfig);
+              }}
               options={[
                 { value: 'lora', label: 'LoRA' },
                 { value: 'lokr', label: 'LoKr' },
+                { value: 'full', label: 'Full Fine-Tune' },
               ]}
             />
             {jobConfig.config.process[0].network?.type == 'lokr' && (
@@ -451,6 +480,27 @@ export default function SimpleJob({
               min={1}
               required
             />
+          </Card>
+          <Card title="Logging">
+            <NumberInput
+              label="Log Every (steps)"
+              value={jobConfig.config.process[0].logging?.log_every ?? 1}
+              onChange={value => setJobConfig(value, 'config.process[0].logging.log_every')}
+              placeholder="eg. 10"
+              min={1}
+            />
+            <FormGroup className="mt-2">
+              <Checkbox
+                label="Use UI Logger"
+                checked={jobConfig.config.process[0].logging?.use_ui_logger ?? true}
+                onChange={value => setJobConfig(value, 'config.process[0].logging.use_ui_logger')}
+              />
+              <Checkbox
+                label="Use Weights & Biases (WandB)"
+                checked={jobConfig.config.process[0].logging?.use_wandb ?? false}
+                onChange={value => setJobConfig(value, 'config.process[0].logging.use_wandb')}
+              />
+            </FormGroup>
           </Card>
         </div>
         <div>
@@ -573,11 +623,23 @@ export default function SimpleJob({
                 )}
 
                 <FormGroup label="Text Encoder Optimizations" className="pt-2">
+                  <Checkbox
+                    label="Train Text Encoder"
+                    checked={jobConfig.config.process[0].train.train_text_encoder || false}
+                    onChange={value => {
+                      setJobConfig(value, 'config.process[0].train.train_text_encoder');
+                      if (value) {
+                        setJobConfig(false, 'config.process[0].train.unload_text_encoder');
+                        setJobConfig(false, 'config.process[0].train.cache_text_embeddings');
+                      }
+                    }}
+                  />
                   {!disableSections.includes('train.unload_text_encoder') && (
                     <Checkbox
                       label="Unload TE"
                       checked={jobConfig.config.process[0].train.unload_text_encoder || false}
                       docKey={'train.unload_text_encoder'}
+                      disabled={jobConfig.config.process[0].train.train_text_encoder}
                       onChange={value => {
                         setJobConfig(value, 'config.process[0].train.unload_text_encoder');
                         if (value) {
@@ -590,6 +652,7 @@ export default function SimpleJob({
                     label="Cache Text Embeddings"
                     checked={jobConfig.config.process[0].train.cache_text_embeddings || false}
                     docKey={'train.cache_text_embeddings'}
+                    disabled={jobConfig.config.process[0].train.train_text_encoder}
                     onChange={value => {
                       setJobConfig(value, 'config.process[0].train.cache_text_embeddings');
                       if (value) {

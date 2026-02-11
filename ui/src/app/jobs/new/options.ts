@@ -1,5 +1,5 @@
 import { GroupedSelectOption, SelectOption, JobConfig } from '@/types';
-import { defaultSliderConfig } from './jobConfig';
+import { defaultSliderConfig, defaultJobConfig } from './jobConfig';
 
 type Control = 'depth' | 'line' | 'pose' | 'inpaint';
 
@@ -11,7 +11,8 @@ type DisableableSections =
   | 'train.diff_output_preservation'
   | 'train.blank_prompt_preservation'
   | 'train.unload_text_encoder'
-  | 'slider';
+  | 'slider'
+  | 'network';
 
 type AdditionalSections =
   | 'datasets.control_path'
@@ -768,6 +769,26 @@ export const jobTypeOptions: JobTypeOption[] = [
     onDeactivate: (config: JobConfig) => {
       // remove slider config
       delete config.config.process[0].slider;
+      return config;
+    },
+  },
+  {
+    value: 'sd_trainer',
+    label: 'Full Fine-tuning',
+    disableSections: ['slider', 'network'],
+    onActivate: (config: JobConfig) => {
+      // remove network config
+      delete config.config.process[0].network;
+      config.config.process[0].type = 'sd_trainer';
+      config.config.process[0].train.train_unet = true;
+      config.config.process[0].train.train_text_encoder = false;
+      config.config.process[0].train.gradient_checkpointing = true;
+      return config;
+    },
+    onDeactivate: (config: JobConfig) => {
+      // add default network config
+      config.config.process[0].network = { ...defaultJobConfig.config.process[0].network };
+      config.config.process[0].type = 'diffusion_trainer';
       return config;
     },
   },

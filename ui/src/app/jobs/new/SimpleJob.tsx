@@ -336,9 +336,10 @@ export default function SimpleJob({
               />
             </Card>
           )}
-          <Card title="Target">
-            <SelectInput
-              label="Target Type"
+          {!disableSections.includes('network') && (
+            <Card title="Target">
+              <SelectInput
+                label="Target Type"
               value={jobConfig.config.process[0].network?.type ?? 'lora'}
               onChange={value => setJobConfig(value, 'config.process[0].network.type')}
               options={[
@@ -391,7 +392,8 @@ export default function SimpleJob({
                 )}
               </>
             )}
-          </Card>
+            </Card>
+          )}
           {!disableSections.includes('slider') && (
             <Card title="Slider">
               <TextInput
@@ -483,6 +485,24 @@ export default function SimpleJob({
                   min={1}
                   required
                 />
+                <Checkbox
+                  label="Train UNet"
+                  className="pt-2"
+                  checked={jobConfig.config.process[0].train.train_unet || false}
+                  onChange={value => setJobConfig(value, 'config.process[0].train.train_unet')}
+                />
+                <Checkbox
+                  label="Train Text Encoder"
+                  className="pt-1"
+                  checked={jobConfig.config.process[0].train.train_text_encoder || false}
+                  onChange={value => setJobConfig(value, 'config.process[0].train.train_text_encoder')}
+                />
+                <Checkbox
+                  label="Gradient Checkpointing"
+                  className="pt-1"
+                  checked={jobConfig.config.process[0].train.gradient_checkpointing || false}
+                  onChange={value => setJobConfig(value, 'config.process[0].train.gradient_checkpointing')}
+                />
               </div>
               <div>
                 <SelectInput
@@ -512,6 +532,17 @@ export default function SimpleJob({
                   min={0}
                   required
                 />
+                <SelectInput
+                  label="Train DType"
+                  className="pt-2"
+                  value={jobConfig.config.process[0].train.dtype || 'bf16'}
+                  onChange={value => setJobConfig(value, 'config.process[0].train.dtype')}
+                  options={[
+                    { value: 'bf16', label: 'BF16' },
+                    { value: 'fp16', label: 'FP16' },
+                    { value: 'fp32', label: 'FP32' },
+                  ]}
+                />
               </div>
               <div>
                 {disableSections.includes('train.timestep_type') ? null : (
@@ -528,6 +559,19 @@ export default function SimpleJob({
                     ]}
                   />
                 )}
+                <SelectInput
+                  label="Noise Scheduler"
+                  className="pt-2"
+                  value={jobConfig.config.process[0].train.noise_scheduler || 'flowmatch'}
+                  onChange={value => setJobConfig(value, 'config.process[0].train.noise_scheduler')}
+                  options={[
+                    { value: 'flowmatch', label: 'FlowMatch' },
+                    { value: 'ddpm', label: 'DDPM' },
+                    { value: 'ddim', label: 'DDIM' },
+                    { value: 'euler', label: 'Euler' },
+                    { value: 'euler_a', label: 'Euler A' },
+                  ]}
+                />
                 <SelectInput
                   label="Timestep Bias"
                   className="pt-2"
@@ -687,6 +731,23 @@ export default function SimpleJob({
           <Card title="Advanced" collapsible>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div>
+                <h3 className="font-bold mb-2">Logging</h3>
+                <NumberInput
+                  label="Log Every"
+                  value={jobConfig.config.process[0].logging?.log_every ?? 10}
+                  onChange={value => setJobConfig(value, 'config.process[0].logging.log_every')}
+                  placeholder="eg. 10"
+                  min={1}
+                />
+                <Checkbox
+                  label="Use WandB"
+                  className="pt-2"
+                  checked={jobConfig.config.process[0].logging?.use_wandb || false}
+                  onChange={value => setJobConfig(value, 'config.process[0].logging.use_wandb')}
+                />
+              </div>
+              <div>
+                <h3 className="font-bold mb-2">Differential Guidance</h3>
                 <Checkbox
                   label="Do Differential Guidance"
                   docKey={'train.do_differential_guidance'}

@@ -7,34 +7,38 @@ interface CardProps {
   children?: React.ReactNode;
   collapsible?: boolean;
   defaultOpen?: boolean;
+  className?: string;
 }
 
-const Card: React.FC<CardProps> = ({ title, children, collapsible, defaultOpen }) => {
+const Card: React.FC<CardProps> = ({ title, children, collapsible, defaultOpen, className }) => {
   if (collapsible) {
     return (
-      <Disclosure as="section" className="space-y-2 px-4 pb-2 pt-2 bg-gray-900 rounded-lg" defaultOpen={defaultOpen}>
+      <Disclosure as="section" className={classNames("space-y-2 px-6 py-4 bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/60 rounded-xl transition-all duration-300 hover:border-zinc-700/80 shadow-sm", className)} defaultOpen={defaultOpen}>
         {({ open }) => (
           <>
-            <DisclosureButton className="w-full text-left flex items-center justify-between">
+            <DisclosureButton className="w-full text-left flex items-center justify-between group focus:outline-none">
               <div className="flex-1">
                 {title && (
-                  <h2 className={classNames('text-lg mb-2 font-semibold uppercase text-gray-500', { 'mb-0': !open })}>
+                  <h2 className={classNames('text-lg font-semibold tracking-tight text-zinc-400 group-hover:text-zinc-200 transition-colors', { 'mb-0': !open })}>
                     {title}
                   </h2>
                 )}
               </div>
-              <FaChevronDown className={`ml-2 inline-block transition-transform ${open ? 'rotate-180' : ''}`} />
+              <FaChevronDown className={classNames("ml-2 text-zinc-600 group-hover:text-zinc-400 transition-transform duration-300", open ? 'rotate-180' : '')} />
             </DisclosureButton>
-            <DisclosurePanel>{children ?? null}</DisclosurePanel>
-            {open && <div className="pt-2"></div>}
+            <DisclosurePanel>
+               <div className="pt-4 animate-in slide-in-from-top-2 fade-in duration-300">
+                 {children ?? null}
+               </div>
+            </DisclosurePanel>
           </>
         )}
       </Disclosure>
     );
   }
   return (
-    <section className="space-y-2 px-4 pb-4 pt-2 bg-gray-900 rounded-lg">
-      {title && <h2 className="text-lg mb-2 font-semibold uppercase text-gray-500">{title}</h2>}
+    <section className={classNames("px-6 py-4 bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/60 rounded-xl transition-all duration-300 hover:border-zinc-700/80 shadow-sm", className)}>
+      {title && <h2 className="text-lg mb-4 font-semibold tracking-tight text-zinc-300">{title}</h2>}
       {children ?? null}
     </section>
   );

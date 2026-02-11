@@ -17,53 +17,53 @@ interface TableProps {
   rows: TableRow[];
   isLoading: boolean;
   theadClassName?: string;
-  onRefresh: () => void;
+  onRefresh?: () => void;
 }
 
 export default function UniversalTable({
   columns,
   rows,
   isLoading,
-  theadClassName = 'text-gray-400',
+  theadClassName,
   onRefresh = () => {},
 }: TableProps) {
   return (
-    <div className="w-full bg-gray-900 rounded-md shadow-md">
+    <div className="w-full bg-zinc-900/40 backdrop-blur-sm rounded-xl border border-zinc-800 shadow-sm overflow-hidden transition-all duration-300 hover:border-zinc-700">
       {isLoading ? (
-        <div className="p-4 flex justify-center">
+        <div className="p-12 flex justify-center items-center">
           <Loading />
         </div>
       ) : rows.length === 0 ? (
-        <div className="p-6 text-center text-gray-400">
-          <p className="text-sm">Empty</p>
+        <div className="p-12 text-center flex flex-col items-center justify-center space-y-3">
+          <p className="text-zinc-500 font-medium text-sm">No items found</p>
           <button
             onClick={() => onRefresh()}
-            className="mt-2 px-3 py-1 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 rounded transition-colors"
+            className="px-4 py-1.5 text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg transition-colors border border-zinc-700 hover:border-zinc-600"
           >
-            Refresh
+            Refresh List
           </button>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left text-gray-300">
-            <thead className={classNames('text-xs uppercase bg-gray-800', theadClassName)}>
+        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-zinc-700">
+          <table className="w-full text-sm text-left text-zinc-300">
+            <thead className={classNames('text-xs uppercase font-semibold text-zinc-500 bg-zinc-900/50 border-b border-zinc-800', theadClassName)}>
               <tr>
                 {columns.map(column => (
-                  <th key={column.key} className="px-3 py-2">
+                  <th key={column.key} className="px-6 py-4 whitespace-nowrap font-medium tracking-wide">
                     {column.title}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-zinc-800/50">
               {rows?.map((row, index) => {
-                // Style for alternating rows
-                const rowClass = index % 2 === 0 ? 'bg-gray-900' : 'bg-gray-800';
-
                 return (
-                  <tr key={index} className={`${rowClass} border-b border-gray-700 hover:bg-gray-700`}>
+                  <tr
+                    key={index}
+                    className="group bg-transparent hover:bg-zinc-800/30 transition-colors duration-150"
+                  >
                     {columns.map(column => (
-                      <td key={column.key} className={classNames('px-3 py-2', column.className)}>
+                      <td key={column.key} className={classNames('px-6 py-4 align-middle', column.className)}>
                         {column.render ? column.render(row) : row[column.key]}
                       </td>
                     ))}

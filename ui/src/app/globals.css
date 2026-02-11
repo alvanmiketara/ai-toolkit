@@ -3,70 +3,88 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #09090b;
+  --foreground: #fafafa;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  /* Custom Scrollbar for Webkit */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-zinc-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-zinc-600;
+  }
+
+  /* Glassmorphism utility */
+  .glass {
+    @apply bg-zinc-900/60 backdrop-blur-md border border-white/5 shadow-xl;
+  }
+
+  .glass-card {
+    @apply bg-zinc-900/40 backdrop-blur-sm border border-white/5 shadow-lg;
+  }
 }
 
 @layer components {
   /* control */
   .aitk-react-select-container .aitk-react-select__control {
-    @apply flex w-full h-8 min-h-0 px-0 text-sm bg-gray-800 border border-gray-700 rounded-sm hover:border-gray-600 items-center;
+    @apply flex w-full h-9 min-h-0 px-1 text-sm bg-zinc-900/50 border border-zinc-700 rounded-md hover:border-zinc-600 items-center transition-colors;
   }
 
   /* selected label */
   .aitk-react-select-container .aitk-react-select__single-value {
-    @apply flex-1 min-w-0 truncate text-sm text-neutral-200;
+    @apply flex-1 min-w-0 truncate text-sm text-zinc-200;
   }
 
   /* invisible input (keeps focus & typing, never wraps) */
   .aitk-react-select-container .aitk-react-select__input-container {
-    @apply text-neutral-200;
+    @apply text-zinc-200;
   }
 
   /* focus */
   .aitk-react-select-container .aitk-react-select__control--is-focused {
-    @apply ring-2 ring-gray-600 border-transparent hover:border-transparent shadow-none;
+    @apply ring-2 ring-primary-500/50 border-primary-500 hover:border-primary-500 shadow-none;
   }
 
   /* menu */
   .aitk-react-select-container .aitk-react-select__menu {
-    @apply bg-gray-800 border border-gray-700;
+    @apply bg-zinc-900 border border-zinc-700 shadow-xl rounded-md mt-1;
   }
 
   /* options */
   .aitk-react-select-container .aitk-react-select__option {
-    @apply text-sm text-neutral-200 bg-gray-800 hover:bg-gray-700;
+    @apply text-sm text-zinc-200 bg-transparent hover:bg-zinc-800 cursor-pointer py-2 px-3;
   }
 
   /* indicator separator */
   .aitk-react-select-container .aitk-react-select__indicator-separator {
-    @apply bg-gray-600;
+    @apply bg-zinc-700;
   }
 
   /* indicators */
   .aitk-react-select-container .aitk-react-select__indicators,
   .aitk-react-select-container .aitk-react-select__indicator {
-    @apply py-0 flex items-center;
+    @apply py-0 flex items-center text-zinc-400 hover:text-zinc-300;
   }
 
   /* placeholder */
   .aitk-react-select-container .aitk-react-select__placeholder {
-    @apply text-sm text-neutral-200;
+    @apply text-sm text-zinc-500;
   }
 }
-
-
-
